@@ -28,8 +28,11 @@ Usage
         print(help_message)
     elif args[0] == "approx" and len(args) == 2:
         phi_approx(int(args[1]))
-    elif args[0] == "converge" and len(args) == 1:
-        phi_converge()
+    elif args[0] == "converge":
+        if len(args) == 1:
+            phi_converge()
+        elif len(args) == 2:
+            phi_converge(args[1])
     else:
         print("Error: input not understood.\n" \
                 "    Type './fib.py help' for info on this program.")
@@ -38,7 +41,7 @@ def fib(n):
     # Create the base case
     n0 = 0
     n1 = 1
-    
+
     # Loop n times. Just ignore the variable i.
     for i in range(n):
         n_new = n0 + n1
@@ -54,7 +57,7 @@ phi_approx_output_format = \
 
 def phi_approx(n, show_output=True):
     """Return the nth-order Fibonacci approximation to the golden ratio."""
-    fib_n = fibbb(n)
+    fib_n = fib(n)
     fib_nm1 = fib(n - 1)
     phi = float(fib_n)/fib_nm1
     if show_output:
@@ -66,17 +69,32 @@ phi_converge_output_format = \
     phi_old: {:.25f}
     phi_new: {:.25f}"""
 
-def phi_converge():
+def phi_converge(file_name = ""):
     """Keep calculating higher-order Fibonacci approximations to the golden
     ratio until it stops changing (to floating-point precision)."""
 
     i = 3
     phi_old = phi_approx(i - 1, show_output=False)
-    phi_new = phi_approx(i)
+    phi_new = phi_approx(i, False)
+    output = phi_approx_output_format.format(i, fib(i), fib(i-1), phi_new)
+    if len(file_name) != 0 :
+        f = open(file_name, "w")
+        f.write(output)
+    else :
+        print(output)
+
     while phi_old != phi_new:
         i += 1
         phi_old = phi_new
         phi_new = phi_approx(i, show_output=False)
-        print(phi_converge_output_format.format(i, phi_new, phi_old))
-    print("\nConverged to %.25f" % phi_new)
+        output = phi_converge_output_format.format(i, phi_new, phi_old)
+        if len(file_name) != 0 :
+            f.write("\n" + output)
+        else:
+            print(output)
+    if len(file_name) != 0 :
+        f.write("\n\nConverged to %.25f" % phi_new)
+        f.close()
+    else:
+        print("\nConverged to %.25f" % phi_new)
 if __name__ == '__main__': main()
